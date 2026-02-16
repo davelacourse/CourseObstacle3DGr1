@@ -4,13 +4,26 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float _playerSpeed = 10f;
     [SerializeField] private float _playerRotationSpeed = 1000f;
-    
+
+    private Animator _animator;  // Component Animator du joueur
+    private PlayerInputActions _playerInputActions;
+
+    private void Start()
+    {
+        _animator = GetComponentInChildren<Animator>();
+        _playerInputActions = new PlayerInputActions();
+        _playerInputActions.Player.Enable();
+    }
+
     private void Update()
     {
-        float directionX = Input.GetAxisRaw("Horizontal");
-        float directionZ = Input.GetAxisRaw("Vertical");
+        // Old input manager
+        // float directionX = Input.GetAxisRaw("Horizontal");
+        // float directionZ = Input.GetAxisRaw("Vertical");
 
-        Vector3 direction = new Vector3(directionX, 0f, directionZ);
+        Vector2 direction2D = _playerInputActions.Player.Move.ReadValue<Vector2>();
+        
+        Vector3 direction = new Vector3(direction2D.x, 0f, direction2D.y);
 
         // Normaliser la valeur du vecteur pour ne pas dépasser 1
         direction.Normalize();
@@ -23,7 +36,14 @@ public class Player : MonoBehaviour
         {
             Quaternion toRotation = Quaternion.LookRotation(direction, Vector3.up);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation
-                , _playerRotationSpeed * Time.deltaTime); ;
+                , _playerRotationSpeed * Time.deltaTime);
+
+            // Jouer l'animation de marche
+           _animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            _animator.SetBool("isWalking", false);
         }
     }
 }
