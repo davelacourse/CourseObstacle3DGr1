@@ -11,7 +11,19 @@ public class CollisionManager : MonoBehaviour
     {
         if (!_estToucher && collision.gameObject.CompareTag("Player"))
         {
-            GetComponent<MeshRenderer>().material = _hitMaterial;
+            if(TryGetComponent<MeshRenderer>(out MeshRenderer meshRenderer)) 
+            {
+                meshRenderer.material = _hitMaterial;
+            }
+            else
+            {
+                MeshRenderer[] mesh = GetComponentsInChildren<MeshRenderer>();
+                foreach(var m in mesh)
+                {
+                    m.material = _hitMaterial;
+                }
+            }
+            
 
             //Augmenter le nombre de collision
             GameManager gameManager = FindAnyObjectByType<GameManager>();

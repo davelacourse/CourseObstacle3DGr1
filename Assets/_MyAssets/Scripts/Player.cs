@@ -7,15 +7,22 @@ public class Player : MonoBehaviour
 
     private Animator _animator;  // Component Animator du joueur
     private PlayerInputActions _playerInputActions;
+    private Rigidbody _rb;
 
     private void Start()
     {
         _animator = GetComponentInChildren<Animator>();
         _playerInputActions = new PlayerInputActions();
         _playerInputActions.Player.Enable();
+        _rb = GetComponent<Rigidbody>();
     }
 
-    private void Update()
+    private void OnDestroy()
+    {
+        _playerInputActions.Player.Disable();
+    }
+
+    private void FixedUpdate()
     {
         // Old input manager
         // float directionX = Input.GetAxisRaw("Horizontal");
@@ -28,9 +35,15 @@ public class Player : MonoBehaviour
         // Normaliser la valeur du vecteur pour ne pas dépasser 1
         direction.Normalize();
 
-        // Déplace le joueur dans la direction du vecteur
-        transform.Translate(direction * Time.deltaTime * _playerSpeed, Space.World);
+        // Déplace le joueur dans la direction du vecteur (téléportation)
+        // transform.Translate(direction * Time.deltaTime * _playerSpeed, Space.World);
 
+        //Déplacer le joueur (vitesse) avec son rigidbody dans la direction du vecteur
+        _rb.linearVelocity = direction * Time.fixedDeltaTime * _playerSpeed;
+
+        //Appliquer une force sur le rigidbody dans la direction du vesteur
+        // _rb.AddForce(direction * Time.fixedDeltaTime * _playerSpeed);
+        
         //Tourner le joueur dans la direction du vecteur
         if(direction != Vector3.zero)
         {
